@@ -2,6 +2,7 @@ require_relative 'voice_activation'
 require_relative 'wit'
 require_relative 'wikipedia'
 require_relative 'wolfram'
+require_relative 'music'
 require_relative 'util'
 
 require 'json'
@@ -34,6 +35,14 @@ def do_wolfram_search(top_hit)
   end
 end
 
+def do_play_song(top_hit)
+  song_query = top_hit['entities']['search_query'][0]['value']
+
+  song_name = Music.queue_song(song_query)
+  Util.say "Now playing: #{song_name}"
+  Music.unpause
+end
+
 Util.say "Claris is online and ready to go."
 
 VoiceActivation.listen_for_keyword('are you there') do
@@ -53,6 +62,8 @@ VoiceActivation.listen_for_keyword('are you there') do
     do_wikipedia_search(top_hit)
   when 'wolfram_search'
     do_wolfram_search(top_hit)
+  when 'play_song'
+    do_play_song(top_hit)
   end
 
   puts "--- Command execution completed. ---"
