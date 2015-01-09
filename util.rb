@@ -27,7 +27,7 @@ module Util
 
     output_config = '-d -b 16 -c 1 -r 16k'
     silence_effect = 'silence 1 0.1 0.5% 1 3.0 0.5%'
-    pad_effect = 'pad 1 0'
+    pad_effect = 'pad 1 1'
 
     `sox #{output_config} #{output_path} #{silence_effect} #{pad_effect}`
 
