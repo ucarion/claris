@@ -4,24 +4,6 @@ require 'httparty'
 require 'digest/sha1'
 
 module Util
-  def self.say(text)
-    puts text
-
-    output_path = "spoken_expressions/#{Digest::SHA1.hexdigest(text)}.mp3"
-    if File.exist?(output_path)
-      puts "Using from cache: #{output_path}"
-    else
-      puts "Fetching ..."
-
-      response = HTTParty.get('http://translate.google.com/translate_tts',
-                              query: { tl: :en_GB, q: text })
-
-      File.write(output_path, response)
-    end
-
-    `play #{output_path}`
-  end
-
   def self.record_message
     output_path = Tempfile.new(['jarvis', '.wav']).path
 
@@ -32,5 +14,37 @@ module Util
     `sox #{output_config} #{output_path} #{silence_effect} #{pad_effect}`
 
     output_path
+  end
+
+  def self.say(text)
+    puts text
+
+    sentences = text.split(/[\.\-]/)
+    synthesized_chunks = sentences.map { |chunk| synthesize_chunk(chunk) }
+
+    output_path = sha_path(text)
+    if sentences.count > 1
+      `sox #{synthesized_chunks.join(" ")} #{output_path}`
+    end
+
+    `play #{output_path}`
+  end
+
+  private
+
+  def self.synthesize_chunk(chunk)
+    output_path = sha_path(chunk)
+    unless File.exist?(output_path)
+      response = HTTParty.get('http://translate.google.com/translate_tts',
+                              query: { tl: :en_GB, q: chunk })
+
+      File.write(output_path, response)
+    end
+
+    output_path
+  end
+
+  def self.sha_path(text)
+    "spoken_expressions/#{Digest::SHA1.hexdigest(text)}.mp3"
   end
 end
