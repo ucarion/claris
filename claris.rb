@@ -34,7 +34,7 @@ def do_wolfram_search(top_hit)
   end
 end
 
-Util.say "Jarvis is online and ready to go."
+Util.say "Claris is online and ready to go."
 
 VoiceActivation.listen_for_keyword('are you there') do
   puts "--- New command detected ... ---"
