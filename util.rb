@@ -23,9 +23,7 @@ module Util
     synthesized_chunks = sentences.map { |chunk| synthesize_chunk(chunk) }
 
     output_path = sha_path(text)
-    if sentences.count > 1
-      `sox #{synthesized_chunks.join(" ")} #{output_path}`
-    end
+    `sox #{synthesized_chunks.join(" ")} #{output_path}`
 
     `play #{output_path}`
   end
