@@ -9,6 +9,34 @@ require 'json'
 
 MY_NAME = "yulees"
 
+def main_loop
+  Util.say "Claris is online and ready to go."
+
+  VoiceActivation.listen_for_keyword('are you there') do
+    puts "--- New command detected ... ---"
+
+    Util.say "Yes?"
+
+    wit_response = Wit.get_intent_from_voice(Util.record_message)
+
+    puts "Understood speech as: #{wit_response['_text'].inspect}"
+
+    top_hit = wit_response['outcomes'].first
+    top_hit_intent = top_hit['intent']
+
+    case top_hit_intent
+    when 'wikipedia_search'
+      do_wikipedia_search(top_hit)
+    when 'wolfram_search'
+      do_wolfram_search(top_hit)
+    when 'play_song'
+      do_play_song(top_hit)
+    end
+
+    puts "--- Command execution completed. ---"
+  end
+end
+
 def do_wikipedia_search(top_hit)
   query = top_hit['entities']['wikipedia_search_query'][0]['value']
 
@@ -43,28 +71,4 @@ def do_play_song(top_hit)
   Music.unpause
 end
 
-Util.say "Claris is online and ready to go."
-
-VoiceActivation.listen_for_keyword('are you there') do
-  puts "--- New command detected ... ---"
-
-  Util.say "Yes?"
-
-  wit_response = Wit.get_intent_from_voice(Util.record_message)
-
-  puts "Understood speech as: #{wit_response['_text'].inspect}"
-
-  top_hit = wit_response['outcomes'].first
-  top_hit_intent = top_hit['intent']
-
-  case top_hit_intent
-  when 'wikipedia_search'
-    do_wikipedia_search(top_hit)
-  when 'wolfram_search'
-    do_wolfram_search(top_hit)
-  when 'play_song'
-    do_play_song(top_hit)
-  end
-
-  puts "--- Command execution completed. ---"
-end
+main_loop
