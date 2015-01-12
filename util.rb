@@ -10,7 +10,7 @@ module Util
     silence_effect = 'silence 1 0.1 0.5% 1 3.0 0.5%'
     pad_effect = 'pad 1 1'
 
-    `rec #{output_path} #{silence_effect} #{pad_effect}`
+    record(output_path, [silence_effect, pad_effect].join(' '))
 
     output_path
   end
@@ -29,15 +29,15 @@ module Util
       `sox #{synthesized_chunks.join(" ")} #{output_path}`
     end
 
-    `play -q #{output_path}`
+    play(output_path)
   end
 
   def self.beep_high
-    `play -q assets/beep_hi.wav`
+    play('assets/beep_hi.wav')
   end
 
   def self.beep_low
-    `play -q assets/beep_lo.wav`
+    play('assets/beep_lo.wav')
   end
 
   private
@@ -57,5 +57,13 @@ module Util
 
   def self.sha_path(text)
     "spoken_expressions/#{Digest::SHA1.hexdigest(text)}.mp3"
+  end
+
+  def self.record(path, options)
+    `rec -q #{path} #{options}`
+  end
+
+  def self.play(path)
+    `play -q #{path}`
   end
 end
