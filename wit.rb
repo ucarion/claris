@@ -1,7 +1,7 @@
 require 'json'
 require 'httparty'
 
-WIT_ACCESS_TOKEN = '57H4WFNTFK2AQY33P7YREOCAL6MWG4FG'
+WIT_ACCESS_TOKEN = ENV['WIT_ACCESS_TOKEN']
 
 module Wit
   def self.get_intent_from_voice(recording_path)

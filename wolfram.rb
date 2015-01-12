@@ -1,6 +1,6 @@
 require 'wolfram'
 
-Wolfram.appid = '8LP92V-AP4WW9G5J3'
+Wolfram.appid = ENV['WOLFRAM_APP_ID']
 
 module WolframUtil
   def self.calculate(query)
