@@ -10,30 +10,30 @@ require 'json'
 MY_NAME = "yulees"
 
 def main_loop
-  Util.say "Claris is online and ready to go."
+  loop do
+    VoiceActivation.listen_for_keyword('are you there') do
+      puts "--- New command detected ... ---"
 
-  VoiceActivation.listen_for_keyword('are you there') do
-    puts "--- New command detected ... ---"
+      Util.say "Yes?"
 
-    Util.say "Yes?"
+      wit_response = Wit.get_intent_from_voice(Util.record_message)
 
-    wit_response = Wit.get_intent_from_voice(Util.record_message)
+      puts "Understood speech as: #{wit_response['_text'].inspect}"
 
-    puts "Understood speech as: #{wit_response['_text'].inspect}"
+      top_hit = wit_response['outcomes'].first
+      top_hit_intent = top_hit['intent']
 
-    top_hit = wit_response['outcomes'].first
-    top_hit_intent = top_hit['intent']
+      case top_hit_intent
+      when 'wikipedia_search'
+        do_wikipedia_search(top_hit)
+      when 'wolfram_search'
+        do_wolfram_search(top_hit)
+      when 'play_song'
+        do_play_song(top_hit)
+      end
 
-    case top_hit_intent
-    when 'wikipedia_search'
-      do_wikipedia_search(top_hit)
-    when 'wolfram_search'
-      do_wolfram_search(top_hit)
-    when 'play_song'
-      do_play_song(top_hit)
+      puts "--- Command execution completed. ---"
     end
-
-    puts "--- Command execution completed. ---"
   end
 end
 
@@ -71,4 +71,6 @@ def do_play_song(top_hit)
   Music.unpause
 end
 
+
+Util.say "Claris is online and ready to go."
 main_loop
