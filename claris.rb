@@ -14,22 +14,28 @@ def main_loop
     VoiceActivation.listen_for_keyword('are you there') do
       puts "--- New command detected ... ---"
 
-      Util.say "Yes?"
+      Util.beep_high
+      message_path = Util.record_message
+      Util.beep_low
 
-      wit_response = Wit.get_intent_from_voice(Util.record_message)
+      wit_response = Wit.get_intent_from_voice(message_path)
 
       puts "Understood speech as: #{wit_response['_text'].inspect}"
 
       top_hit = wit_response['outcomes'].first
-      top_hit_intent = top_hit['intent']
+      entities = top_hit['entities']
 
-      case top_hit_intent
-      when 'wikipedia_search'
-        do_wikipedia_search(top_hit)
-      when 'wolfram_search'
-        do_wolfram_search(top_hit)
+      case top_hit['intent']
+      when 'search'
+        search_provider = entities['search_provider'][0]['value']
+        search_query = entities['search_query'][0]['value']
+
+        do_search(search_provider, search_query)
+
       when 'play_song'
-        do_play_song(top_hit)
+        song_query = top_hit['entities']['search_query'][0]['value']
+
+        do_play_song(song_query)
       end
 
       puts "--- Command execution completed. ---"
@@ -37,9 +43,16 @@ def main_loop
   end
 end
 
-def do_wikipedia_search(top_hit)
-  query = top_hit['entities']['wikipedia_search_query'][0]['value']
+def do_search(provider, query)
+  case provider
+  when 'Wikipedia'
+    do_wikipedia_search(query)
+  when 'Wolfram Alpha'
+    do_wolfram_search(query)
+  end
+end
 
+def do_wikipedia_search(query)
   Util.say "I am searching Wikipedia for information about #{query}."
 
   relevant_articles = Wikipedia.search_articles(query)
@@ -49,9 +62,7 @@ def do_wikipedia_search(top_hit)
   Util.say summary
 end
 
-def do_wolfram_search(top_hit)
-  query = top_hit['entities']['wolfram_search_query'][0]['value']
-
+def do_wolfram_search(query)
   Util.say "I am searching Wolfram Alpha for information about #{query}."
 
   result = WolframUtil.calculate(query)
@@ -63,14 +74,11 @@ def do_wolfram_search(top_hit)
   end
 end
 
-def do_play_song(top_hit)
-  song_query = top_hit['entities']['search_query'][0]['value']
-
-  song_name = Music.queue_song(song_query)
+def do_play_song(song)
+  song_name = Music.queue_song(song)
   Util.say "Now playing: #{song_name}"
   Music.unpause
 end
-
 
 Util.say "Claris is online and ready to go."
 main_loop
