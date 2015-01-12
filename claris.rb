@@ -7,8 +7,6 @@ require_relative 'util'
 
 require 'json'
 
-MY_NAME = "yulees"
-
 def main_loop
   loop do
     VoiceActivation.listen_for_keyword('are you there') do
