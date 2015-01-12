@@ -32,6 +32,14 @@ module Util
     `play -q #{output_path}`
   end
 
+  def self.beep_high
+    `play -q assets/beep_hi.wav`
+  end
+
+  def self.beep_low
+    `play -q assets/beep_lo.wav`
+  end
+
   private
 
   def self.synthesize_chunk(chunk)
