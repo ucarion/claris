@@ -1,3 +1,7 @@
+# Load environment variables before doing anything else.
+require 'dotenv'
+Dotenv.load
+
 require_relative 'voice_activation'
 require_relative 'wit'
 require_relative 'wikipedia'
